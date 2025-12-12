@@ -28,3 +28,37 @@ export function truncateAddress(address: string | undefined | null) {
 
   return `${start}...${end}`;
 }
+
+type ResourceType = "address" | "transaction";
+
+export function getExplorerUrl(
+  chainId: number,
+  hashOrAddress: string,
+  resourceType: ResourceType,
+): string {
+  const explorers: Record<number, string> = {
+    1: "https://etherscan.io",
+    11155111: "https://sepolia.etherscan.io",
+    84532: "https://sepolia.basescan.org",
+    31337: "#",
+  };
+
+  const resourcePaths: Record<ResourceType, string> = {
+    address: "/address/",
+    transaction: "/tx/",
+  };
+
+  const baseUrl: string | undefined = explorers[chainId];
+
+  if (!baseUrl || baseUrl === "#") {
+    return "#";
+  }
+
+  const path: string | undefined = resourcePaths[resourceType];
+
+  if (!path) {
+    return "#";
+  }
+
+  return `${baseUrl}${path}${hashOrAddress}`;
+}

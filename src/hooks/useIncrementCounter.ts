@@ -1,16 +1,32 @@
 // src/components/WriteInc.tsx
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { counterConfig } from "@/config/generated";
-import { hardhat } from "wagmi/chains";
+import { useWaitForTransactionReceipt } from "wagmi";
+import { useWriteCounterInc, useWriteCounterIncBy } from "@/config/generated";
 
 export default function useIncrementCounter() {
   const {
-    data: hash,
-    writeContract,
-    isPending: isWritePending,
-    isError,
-    error,
-  } = useWriteContract();
+    data: hashInc,
+    isPending: isPendingInc,
+    isError: isErrorInc,
+    error: errorInc,
+    writeContract: incCounter,
+    isIdle: isIdleInc,
+  } = useWriteCounterInc();
+
+  const {
+    data: hashIncBy,
+    isPending: isPendingIncBy,
+    isError: isErrorIncBy,
+    error: errorIncBy,
+    writeContract: incCounterBy,
+    isIdle: isIdleIncBy,
+  } = useWriteCounterIncBy();
+
+  // Derive unified state
+  const hash = hashInc || hashIncBy;
+  const isPending = isPendingInc || isPendingIncBy;
+  const isError = isErrorInc || isErrorIncBy;
+  const error = errorInc || errorIncBy;
+  const isIdle = isIdleInc && isIdleIncBy;
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
@@ -18,30 +34,24 @@ export default function useIncrementCounter() {
     });
 
   const handleInc = () => {
-    writeContract({
-      abi: counterConfig.abi,
-      address: counterConfig.address[hardhat.id],
-      functionName: "inc",
-      args: [], // inc takes no arguments
-    });
+    incCounter({});
   };
 
   const handleIncBy = (incBy: bigint) => {
-    writeContract({
-      abi: counterConfig.abi,
-      address: counterConfig.address[hardhat.id],
-      functionName: "incBy",
+    incCounterBy({
       args: [incBy],
     });
   };
+
   return {
     handleInc,
     handleIncBy,
     hash,
-    isWritePending,
+    isPending,
     isConfirming,
     isConfirmed,
     isError,
     error,
+    isIdle,
   };
 }

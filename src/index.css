@@ -1,9 +1,13 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: "Satoshi", "system-ui", "sans-serif";
+  --font-mono: "Space Mono", "monospace";
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -116,5 +120,41 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Light.otf") format("opentype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Medium.otf") format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Bold.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Satoshi";
+    src: url("/fonts/Satoshi-Black.otf") format("opentype");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
   }
 }
