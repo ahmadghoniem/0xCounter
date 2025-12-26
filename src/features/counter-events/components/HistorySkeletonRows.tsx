@@ -1,11 +1,9 @@
 interface HistorySkeletonRowsProps {
-  count: number;
+  count: number
 }
 
-export default function HistorySkeletonRows({
-  count,
-}: HistorySkeletonRowsProps) {
-  if (count <= 0) return null;
+export default function HistorySkeletonRows({ count }: HistorySkeletonRowsProps) {
+  if (count <= 0) return null
 
   return (
     <>
@@ -17,5 +15,5 @@ export default function HistorySkeletonRows({
         />
       ))}
     </>
-  );
+  )
 }

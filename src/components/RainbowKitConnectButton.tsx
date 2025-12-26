@@ -1,4 +1,4 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectButton } from "@rainbow-me/rainbowkit"
 
 export default function RainbowKitConnectButton() {
   return (
@@ -12,5 +12,5 @@ export default function RainbowKitConnectButton() {
         />
       </div>
     </div>
-  );
+  )
 }

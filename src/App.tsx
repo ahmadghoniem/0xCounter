@@ -1,41 +1,29 @@
-import { useAccount, useChainId } from "wagmi";
-import RainbowKitConnectButton from "@/components/RainbowKitConnectButton";
-import CounterHistory from "@/components/CounterHistory";
-import { Toaster } from "sonner";
-import CounterCard from "@/components/CounterCard";
-import IdentityCard from "@/components/IdentityCard";
+import RainbowKitConnectButton from "@/components/RainbowKitConnectButton"
+import { CounterCard } from "@/features/counter"
+import { CounterEvents } from "@/features/counter-events"
+import { IdentityCard } from "@/features/identity"
+import { Toaster } from "sonner"
+import { useChainId } from "wagmi"
 
 export default function App() {
-  const { isConnected, isConnecting } = useAccount(); // can use chain?.name to get connected chain name instead of just it's Id using useChainId
-  const chainId = useChainId();
-
-  if (!isConnected) {
-    return (
-      <>
-        {/**TODO: turn into an empty component? */}
-        <p className="text-center">Make sure to connect your wallet</p>
-        <RainbowKitConnectButton />
-      </>
-    );
-  }
-  if (isConnecting) {
-    return <p className="text-center">Loading...</p>;
-  }
-
+  const chainId = useChainId()
   return (
     <>
-      <div className="min-h-screen flex items-center justify-center font-sans">
+      <div className="flex min-h-screen items-center justify-center font-sans">
         <RainbowKitConnectButton />
         <div className="flex gap-2">
-          <div className="flex flex-col gap-2">
-            <CounterCard />
-            <IdentityCard />
+          <div className="grid grid-rows-3 gap-2">
+            <div className="row-span-2 flex flex-col">
+              <CounterCard />
+            </div>
+            <div className="row-span-1 flex flex-col">
+              <IdentityCard />
+            </div>
           </div>
-          <CounterHistory key={chainId} />
+          <CounterEvents key={chainId} />
         </div>
       </div>
       <Toaster />
     </>
-  );
+  )
 }
-//

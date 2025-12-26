@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 /**
@@ -14,51 +14,51 @@ export function cn(...inputs: ClassValue[]) {
 export function truncateAddress(address: string | undefined | null) {
   // Check if the address is valid, not null, and long enough to truncate
   if (!address || typeof address !== "string" || address.length < 10) {
-    return "";
+    return ""
   }
 
   // Ensure it's a valid hex address by checking the '0x' prefix (optional but good practice)
   if (!address.startsWith("0x")) {
-    return "";
+    return ""
   }
 
   // Take the first 6 characters (including '0x') and the last 4 characters
-  const start = address.substring(0, 6);
-  const end = address.substring(address.length - 4);
+  const start = address.substring(0, 6)
+  const end = address.substring(address.length - 4)
 
-  return `${start}...${end}`;
+  return `${start}...${end}`
 }
 
-type ResourceType = "address" | "transaction";
+type ResourceType = "address" | "transaction"
 
 export function getExplorerUrl(
   chainId: number,
   hashOrAddress: string,
-  resourceType: ResourceType,
+  resourceType: ResourceType
 ): string {
   const explorers: Record<number, string> = {
     1: "https://etherscan.io",
     11155111: "https://sepolia.etherscan.io",
     84532: "https://sepolia.basescan.org",
-    31337: "#",
-  };
+    31337: "#"
+  }
 
   const resourcePaths: Record<ResourceType, string> = {
     address: "/address/",
-    transaction: "/tx/",
-  };
+    transaction: "/tx/"
+  }
 
-  const baseUrl: string | undefined = explorers[chainId];
+  const baseUrl: string | undefined = explorers[chainId]
 
   if (!baseUrl || baseUrl === "#") {
-    return "#";
+    return "#"
   }
 
-  const path: string | undefined = resourcePaths[resourceType];
+  const path: string | undefined = resourcePaths[resourceType]
 
   if (!path) {
-    return "#";
+    return "#"
   }
 
-  return `${baseUrl}${path}${hashOrAddress}`;
+  return `${baseUrl}${path}${hashOrAddress}`
 }

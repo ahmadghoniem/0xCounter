@@ -1,17 +1,19 @@
-import { useEffect } from "react";
-import { toast } from "sonner";
-import { TransactionLink } from "@/components/TransactionLink";
-import { BaseError } from "wagmi";
+import { TransactionLink } from "@/components/TransactionLink"
+import { useEffect, useMemo } from "react"
+import { toast } from "sonner"
+import { BaseError, useChainId } from "wagmi"
 
 interface UseTransactionToastProps {
-  isPending: boolean;
-  isConfirming: boolean;
-  isConfirmed: boolean;
-  isError: boolean;
-  error: Error | BaseError | null;
-  hash?: string;
-  isIdle: boolean;
+  isPending: boolean
+  isConfirming: boolean
+  isConfirmed: boolean
+  isError: boolean
+  error: Error | BaseError | null
+  hash?: `0x${string}`
+  isIdle: boolean
 }
+
+type Stage = "idle" | "error" | "signing" | "confirming" | "confirmed"
 
 export function useTransactionToast({
   isPending,
@@ -20,48 +22,67 @@ export function useTransactionToast({
   isError,
   error,
   hash,
-  isIdle,
+  isIdle
 }: UseTransactionToastProps) {
+  const chainId = useChainId()
+
+  const stage: Stage = useMemo(() => {
+    if (isIdle && !hash) return "idle"
+    if (isError) return "error"
+    if (isPending) return "signing"
+    if (isConfirming) return "confirming"
+    if (isConfirmed) return "confirmed"
+    return "idle"
+  }, [isIdle, hash, isError, isPending, isConfirming, isConfirmed])
+  console.log(`Stage: ${stage}, Hash: ${hash}, Error: ${error?.message}`)
+  // Dismiss toast on unmount
+  // useEffect(() => {
+  //   return () => {
+  //     toast.dismiss("tx-lifecycle")
+  //   }
+  // }, [])
+
   useEffect(() => {
-    // Initial signature request
-    if (isPending && !hash) {
-      toast.loading("Awaiting wallet signature...", {
-        id: "tx-status",
-      });
+    if (stage === "idle") {
+      toast.dismiss("tx-lifecycle")
+      return
     }
 
-    const txDescription = hash ? (
-      <div className="flex items-center gap-2">
-        view on explorer
-        <TransactionLink hash={hash} />
-      </div>
-    ) : undefined;
-
-    // Transaction submitted but not yet confirming
-    if (!isIdle && !isPending && !isConfirming && !isConfirmed) {
-      toast.message("Transaction submitted", {
-        id: "tx-status",
-        description: "broadcasting to the network...",
-      });
-    }
-
-    // Confirming
-    if (isConfirming) {
-      toast.loading("Processing transaction...", {
-        id: "tx-status",
-        description: txDescription,
-      });
-    }
-
-    // Error
-    if (isError) {
+    if (stage === "error") {
       toast.error("Transaction failed", {
-        id: "tx-status",
-        description: error?.cause
-          ?.toString()
-          .split("Request Arguments")[0]
-          .trim(),
-      });
+        id: "tx-lifecycle",
+        description: error?.cause?.toString().split("Request Arguments")[0].trim(),
+        action: null
+      })
+      return
     }
-  }, [isPending, hash, isConfirming, isConfirmed, isError, error, isIdle]);
+
+    if (stage === "signing") {
+      toast.loading("Awaiting wallet confirmation…", {
+        id: "tx-lifecycle",
+        description: null,
+        action: null
+      })
+      return
+    }
+
+    if (stage === "confirming" && hash) {
+      toast.loading("Transaction sent", {
+        id: "tx-lifecycle",
+        description: "Waiting for confirmation…",
+        action: <TransactionLink hash={hash} showTooltip={false} />
+      })
+      return
+    }
+
+    if (stage === "confirmed" && hash) {
+      toast.success("Transaction confirmed", {
+        id: "tx-lifecycle",
+        description: "View on Explorer",
+        action: <TransactionLink hash={hash} showTooltip={false} />,
+        duration: 500
+      })
+      return
+    }
+  }, [stage, hash, error, chainId])
 }

@@ -1,9 +1,9 @@
 import {
   createUseReadContract,
-  createUseWriteContract,
   createUseSimulateContract,
   createUseWatchContractEvent,
-} from 'wagmi/codegen'
+  createUseWriteContract
+} from "wagmi/codegen"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Counter
@@ -14,51 +14,51 @@ import {
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x81F81aBA45E26715a90eA59FD17dbbd4C2245326)
  */
 export const counterAbi = [
-  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
-  { type: 'error', inputs: [], name: 'InvalidIncrement' },
-  { type: 'error', inputs: [], name: 'NotOwner' },
+  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
+  { type: "error", inputs: [], name: "InvalidIncrement" },
+  { type: "error", inputs: [], name: "NotOwner" },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'caller',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
+        name: "caller",
+        internalType: "address",
+        type: "address",
+        indexed: true
       },
-      { name: 'by', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: "by", internalType: "uint256", type: "uint256", indexed: false }
     ],
-    name: 'Increment',
+    name: "Increment"
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'count',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
+    name: "count",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view"
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'inc',
+    name: "inc",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable"
   },
   {
-    type: 'function',
-    inputs: [{ name: 'by', internalType: 'uint256', type: 'uint256' }],
-    name: 'incBy',
+    type: "function",
+    inputs: [{ name: "by", internalType: "uint256", type: "uint256" }],
+    name: "incBy",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable"
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
+    name: "owner",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view"
+  }
 ] as const
 
 /**
@@ -66,8 +66,8 @@ export const counterAbi = [
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x81F81aBA45E26715a90eA59FD17dbbd4C2245326)
  */
 export const counterAddress = {
-  31337: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-  11155111: '0x81F81aBA45E26715a90eA59FD17dbbd4C2245326',
+  31337: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+  11155111: "0x81F81aBA45E26715a90eA59FD17dbbd4C2245326"
 } as const
 
 /**
@@ -76,7 +76,7 @@ export const counterAddress = {
  */
 export const counterConfig = {
   address: counterAddress,
-  abi: counterAbi,
+  abi: counterAbi
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ export const counterConfig = {
  */
 export const useReadCounter = /*#__PURE__*/ createUseReadContract({
   abi: counterAbi,
-  address: counterAddress,
+  address: counterAddress
 })
 
 /**
@@ -103,7 +103,7 @@ export const useReadCounter = /*#__PURE__*/ createUseReadContract({
 export const useReadCounterCount = /*#__PURE__*/ createUseReadContract({
   abi: counterAbi,
   address: counterAddress,
-  functionName: 'count',
+  functionName: "count"
 })
 
 /**
@@ -115,7 +115,7 @@ export const useReadCounterCount = /*#__PURE__*/ createUseReadContract({
 export const useReadCounterOwner = /*#__PURE__*/ createUseReadContract({
   abi: counterAbi,
   address: counterAddress,
-  functionName: 'owner',
+  functionName: "owner"
 })
 
 /**
@@ -126,7 +126,7 @@ export const useReadCounterOwner = /*#__PURE__*/ createUseReadContract({
  */
 export const useWriteCounter = /*#__PURE__*/ createUseWriteContract({
   abi: counterAbi,
-  address: counterAddress,
+  address: counterAddress
 })
 
 /**
@@ -138,7 +138,7 @@ export const useWriteCounter = /*#__PURE__*/ createUseWriteContract({
 export const useWriteCounterInc = /*#__PURE__*/ createUseWriteContract({
   abi: counterAbi,
   address: counterAddress,
-  functionName: 'inc',
+  functionName: "inc"
 })
 
 /**
@@ -150,7 +150,7 @@ export const useWriteCounterInc = /*#__PURE__*/ createUseWriteContract({
 export const useWriteCounterIncBy = /*#__PURE__*/ createUseWriteContract({
   abi: counterAbi,
   address: counterAddress,
-  functionName: 'incBy',
+  functionName: "incBy"
 })
 
 /**
@@ -161,7 +161,7 @@ export const useWriteCounterIncBy = /*#__PURE__*/ createUseWriteContract({
  */
 export const useSimulateCounter = /*#__PURE__*/ createUseSimulateContract({
   abi: counterAbi,
-  address: counterAddress,
+  address: counterAddress
 })
 
 /**
@@ -173,7 +173,7 @@ export const useSimulateCounter = /*#__PURE__*/ createUseSimulateContract({
 export const useSimulateCounterInc = /*#__PURE__*/ createUseSimulateContract({
   abi: counterAbi,
   address: counterAddress,
-  functionName: 'inc',
+  functionName: "inc"
 })
 
 /**
@@ -185,7 +185,7 @@ export const useSimulateCounterInc = /*#__PURE__*/ createUseSimulateContract({
 export const useSimulateCounterIncBy = /*#__PURE__*/ createUseSimulateContract({
   abi: counterAbi,
   address: counterAddress,
-  functionName: 'incBy',
+  functionName: "incBy"
 })
 
 /**
@@ -196,7 +196,7 @@ export const useSimulateCounterIncBy = /*#__PURE__*/ createUseSimulateContract({
  */
 export const useWatchCounterEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: counterAbi,
-  address: counterAddress,
+  address: counterAddress
 })
 
 /**
@@ -205,9 +205,8 @@ export const useWatchCounterEvent = /*#__PURE__*/ createUseWatchContractEvent({
  * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x81F81aBA45E26715a90eA59FD17dbbd4C2245326)
  */
-export const useWatchCounterIncrementEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: counterAbi,
-    address: counterAddress,
-    eventName: 'Increment',
-  })
+export const useWatchCounterIncrementEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: counterAbi,
+  address: counterAddress,
+  eventName: "Increment"
+})

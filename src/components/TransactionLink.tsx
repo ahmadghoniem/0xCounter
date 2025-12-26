@@ -1,54 +1,68 @@
-import { ExternalLink } from "lucide-react";
-import { useChainId } from "wagmi";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { getExplorerUrl } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn, getExplorerUrl } from "@/lib/utils"
+import { ExternalLink } from "lucide-react"
+import { useChainId } from "wagmi"
 
 interface TransactionLinkProps {
-  hash: string;
-  className?: string;
+  hash: string
+  className?: string
+  showTooltip?: boolean
 }
 
-export function TransactionLink({ hash, className }: TransactionLinkProps) {
-  const chainId = useChainId();
-  const explorerUrl = getExplorerUrl(chainId, hash, "transaction");
-  const isLocalChain = chainId === 31337;
+export function TransactionLink({ hash, className, showTooltip = true }: TransactionLinkProps) {
+  const chainId = useChainId()
+  const explorerUrl = getExplorerUrl(chainId, hash, "transaction")
+  const isLocalChain = chainId === 31337
 
   return (
     <div
       className={cn(
-        "ml-auto mr-2 opacity-40 group-hover/item:opacity-100 transition-opacity",
-        className,
+        "mr-2 ml-auto opacity-40 transition-opacity group-hover/item:opacity-100",
+        className
       )}
     >
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {isLocalChain ? (
-              <span className="flex items-center justify-center p-1.5 rounded-md text-muted-foreground/50 cursor-not-allowed">
-                <ExternalLink className="h-4 w-4" />
-              </span>
-            ) : (
-              <a
-                href={explorerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            )}
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>View Transaction</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      {showTooltip ? (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {isLocalChain ? (
+                <span className="text-muted-foreground/50 flex cursor-not-allowed items-center justify-center rounded-md p-1.5">
+                  <ExternalLink className="size-4" />
+                </span>
+              ) : (
+                <a
+                  href={explorerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/10 flex items-center justify-center rounded-md p-1.5 transition-colors"
+                >
+                  <ExternalLink className="size-4" />
+                </a>
+              )}
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>View Transaction</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        <>
+          {isLocalChain ? (
+            <span className="text-muted-foreground/50 flex cursor-not-allowed items-center justify-center rounded-md p-1.5">
+              <ExternalLink className="size-4" />
+            </span>
+          ) : (
+            <a
+              href={explorerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary hover:bg-primary/10 flex items-center justify-center rounded-md p-1.5 transition-colors"
+            >
+              <ExternalLink className="size-4" />
+            </a>
+          )}
+        </>
+      )}
     </div>
-  );
+  )
 }
