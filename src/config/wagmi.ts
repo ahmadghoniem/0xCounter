@@ -4,6 +4,10 @@ import { baseSepolia, hardhat, sepolia } from "wagmi/chains"
 
 const ETHEREUM_SEPOLIA_RPC_URL = import.meta.env.VITE_ETHEREUM_SEPOLIA_RPC_URL
 const BASE_SEPOLIA_RPC_URL = import.meta.env.VITE_BASE_SEPOLIA_RPC_URL
+
+export const APP_URLS = {
+  ENS: "https://sepolia.app.ens.domains/"
+} as const
 export const wagmiConfig = getDefaultConfig({
   appName: "BasicWeb3",
   // Every dApp that relies on WalletConnect now needs to obtain a projectId from WalletConnect Cloud.

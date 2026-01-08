@@ -6,9 +6,11 @@ export const supabase = createClient(supabaseUrl!, supabaseKey!)
 // TypeScript types for CounterEvent table
 export type CounterEvent = {
   id: number
+  chain_id: number
+  contract_address: `0x${string}`
   tx_hash: string
   block_number: number
-  caller_address: string
-  inc_by: string
-  indexed_at: string
+  caller_address: `0x${string}`
+  inc_by: number
+  indexed_at: string // timestamptz maps to ISO string
 }

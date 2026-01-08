@@ -37,10 +37,7 @@ export default function useIncrementCounter() {
 
   const { isLoading: isConfirmingRaw, isSuccess: isConfirmedRaw } = useWaitForTransactionReceipt({
     hash,
-    chainId: chainId,
-    query: {
-      enabled: !!hash
-    }
+    chainId: chainId
   })
 
   // Guard against stale state - only valid when hash exists
@@ -53,20 +50,17 @@ export default function useIncrementCounter() {
   }, [resetInc, resetIncBy])
 
   const handleInc = () => {
-    // resetAll()
     incCounter({})
   }
 
   const handleIncBy = (incBy: bigint) => {
-    // resetAll()
     incCounterBy({
       args: [incBy]
     })
   }
 
-  // In your hook/component
   watchChainId(config, {
-    onChange: (newChainId) => {
+    onChange: () => {
       resetAll()
     }
   })

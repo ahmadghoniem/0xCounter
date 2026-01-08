@@ -1,12 +1,12 @@
-import { useAccount, useChainId, useEnsAvatar, useEnsName, useEnsText } from "wagmi"
+import { useAccount, useEnsAvatar, useEnsName, useEnsText } from "wagmi"
+import { useIsLocalNetwork } from "@/hooks/useIsLocalNetwork"
 import { sepolia } from "wagmi/chains"
 
 export function useEnsProfile() {
   const { address } = useAccount()
-  const chainId = useChainId()
+  const isLocalNetwork = useIsLocalNetwork()
 
-  // Don't fetch ENS data on Hardhat (chainId 31337)
-  const shouldFetchEns = chainId !== 31337 && !!address
+  const shouldFetchEns = !isLocalNetwork && !!address
 
   const { data: ensName } = useEnsName({
     address,
@@ -23,8 +23,7 @@ export function useEnsProfile() {
       enabled: shouldFetchEns && !!ensName
     }
   })
-
-  const { data: ensBanner } = useEnsText({
+  const { data: ensHeader } = useEnsText({
     name: ensName ?? undefined,
     key: "header",
     chainId: sepolia.id,
@@ -32,10 +31,12 @@ export function useEnsProfile() {
       enabled: shouldFetchEns && !!ensName
     }
   })
+  console.log(ensName, ensAvatar, ensHeader)
+
   return {
     ensName,
     ensAvatar,
-    ensBanner,
+    ensHeader,
     address
   }
 }

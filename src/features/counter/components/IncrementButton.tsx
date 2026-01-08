@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useReadCounterOwner } from "@/config/generated"
 import { useTransactionToast } from "@/hooks/useTransactionToast"
+import { toLowerAddress } from "@/lib/utils"
 import { Loader2, Plus } from "lucide-react"
 import { useState } from "react"
 import { useAccount } from "wagmi"
@@ -23,7 +24,7 @@ export default function IncrementButton() {
   const { address } = useAccount()
   const { data: owner } = useReadCounterOwner()
 
-  const isOwner = owner?.toLowerCase() === address?.toLowerCase()
+  const isOwner = owner && address && toLowerAddress(owner) === toLowerAddress(address)
   const [customIncrement, setCustomIncrement] = useState<bigint>(1n)
 
   useTransactionToast({

@@ -1,7 +1,8 @@
 import { TransactionLink } from "@/components/TransactionLink"
+import { useIsLocalNetwork } from "@/hooks/useIsLocalNetwork"
 import { useEffect, useMemo } from "react"
 import { toast } from "sonner"
-import { BaseError, useChainId } from "wagmi"
+import { BaseError, useAccount, useChainId } from "wagmi"
 
 interface UseTransactionToastProps {
   isPending: boolean
@@ -25,7 +26,9 @@ export function useTransactionToast({
   isIdle
 }: UseTransactionToastProps) {
   const chainId = useChainId()
-
+  const isLocalNetwork = useIsLocalNetwork()
+  const { chain } = useAccount()
+  const blockExplorerName = chain?.blockExplorers?.default?.name || "Block Explorer"
   const stage: Stage = useMemo(() => {
     if (isIdle && !hash) return "idle"
     if (isError) return "error"
@@ -34,13 +37,6 @@ export function useTransactionToast({
     if (isConfirmed) return "confirmed"
     return "idle"
   }, [isIdle, hash, isError, isPending, isConfirming, isConfirmed])
-  console.log(`Stage: ${stage}, Hash: ${hash}, Error: ${error?.message}`)
-  // Dismiss toast on unmount
-  // useEffect(() => {
-  //   return () => {
-  //     toast.dismiss("tx-lifecycle")
-  //   }
-  // }, [])
 
   useEffect(() => {
     if (stage === "idle") {
@@ -78,11 +74,10 @@ export function useTransactionToast({
     if (stage === "confirmed" && hash) {
       toast.success("Transaction confirmed", {
         id: "tx-lifecycle",
-        description: "View on Explorer",
-        action: <TransactionLink hash={hash} showTooltip={false} />,
-        duration: 500
+        description: !isLocalNetwork && `View on ${blockExplorerName}`,
+        action: <TransactionLink hash={hash} showTooltip={false} />
       })
       return
     }
-  }, [stage, hash, error, chainId])
+  }, [stage, hash, error, chainId, isLocalNetwork, blockExplorerName])
 }

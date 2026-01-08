@@ -1,4 +1,5 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useIsLocalNetwork } from "@/hooks/useIsLocalNetwork"
 import { cn, getExplorerUrl } from "@/lib/utils"
 import { ExternalLink } from "lucide-react"
 import { useChainId } from "wagmi"
@@ -12,7 +13,7 @@ interface TransactionLinkProps {
 export function TransactionLink({ hash, className, showTooltip = true }: TransactionLinkProps) {
   const chainId = useChainId()
   const explorerUrl = getExplorerUrl(chainId, hash, "transaction")
-  const isLocalChain = chainId === 31337
+  const isLocalNetwork = useIsLocalNetwork()
 
   return (
     <div
@@ -25,7 +26,7 @@ export function TransactionLink({ hash, className, showTooltip = true }: Transac
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              {isLocalChain ? (
+              {isLocalNetwork ? (
                 <span className="text-muted-foreground/50 flex cursor-not-allowed items-center justify-center rounded-md p-1.5">
                   <ExternalLink className="size-4" />
                 </span>
@@ -47,7 +48,7 @@ export function TransactionLink({ hash, className, showTooltip = true }: Transac
         </TooltipProvider>
       ) : (
         <>
-          {isLocalChain ? (
+          {isLocalNetwork ? (
             <span className="text-muted-foreground/50 flex cursor-not-allowed items-center justify-center rounded-md p-1.5">
               <ExternalLink className="size-4" />
             </span>

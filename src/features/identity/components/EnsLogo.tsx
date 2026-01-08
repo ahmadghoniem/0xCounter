@@ -1,4 +1,3 @@
-// src/components/ui/EnsLogo.tsx
 import React from "react"
 
 export const EnsLogo = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (

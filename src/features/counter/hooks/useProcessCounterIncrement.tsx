@@ -1,16 +1,17 @@
+import { Address } from "@/components/Address"
 import { TransactionLink } from "@/components/TransactionLink"
 import { counterAddress, useWatchCounterIncrementEvent } from "@/config/generated"
-import { truncateAddress } from "@/lib/utils"
+import { toLowerAddress } from "@/lib/utils"
 import { supabase } from "@/services/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { useAccount, useChainId } from "wagmi"
 
-export default function useCounterIncrListener(refetchCount: () => void) {
+export default function useProcessCounterIncrement(refetchCount: () => void) {
   const queryClient = useQueryClient()
   const chainId = useChainId()
-  const { address } = useAccount()
-
+  const { address, chain } = useAccount()
+  const blockExplorerName = chain?.blockExplorers?.default?.name || "Block Explorer"
   useWatchCounterIncrementEvent({
     onError(error) {
       console.log("Error", error)
@@ -21,15 +22,15 @@ export default function useCounterIncrListener(refetchCount: () => void) {
 
       Promise.all(
         logs.map(async (log) => {
-          const incBy = log.args?.by
-          const contractAddress = log.address.toLowerCase()
+          const incBy = log.args.by
+          const contractAddress = log.address
           const contractChainId = Number(
             Object.entries(counterAddress).find(
-              ([, addr]) => addr.toLowerCase() === contractAddress
+              ([, addr]) => toLowerAddress(addr) === toLowerAddress(contractAddress)
             )?.[0]
           )
-          const callerAddress = log.args?.caller?.toLowerCase()
-          const txHash = log.transactionHash
+          const callerAddress = toLowerAddress(log.args.caller!)
+          const txHash = toLowerAddress(log.transactionHash)
 
           if (incBy === undefined) return
 
@@ -38,11 +39,11 @@ export default function useCounterIncrListener(refetchCount: () => void) {
               .from("counter_events")
               .insert({
                 tx_hash: txHash,
-                block_number: Number(log.blockNumber),
+                inc_by: incBy.toString(),
                 contract_address: contractAddress,
-                chain_id: chainId,
                 caller_address: callerAddress,
-                inc_by: incBy.toString()
+                block_number: Number(log.blockNumber),
+                chain_id: chainId
               })
               .select()
               .single()
@@ -55,16 +56,29 @@ export default function useCounterIncrListener(refetchCount: () => void) {
               console.error("Supabase insert error:", error)
               return
             }
-            if (callerAddress !== address?.toLowerCase() && chainId === contractChainId) {
-              toast.success(`Counter incremented by ${truncateAddress(callerAddress)}`, {
-                description: `Incremented by ${incBy.toString()}.View on Explorer`,
-                action: <TransactionLink hash={txHash} showTooltip={false} />
-              })
+            // IMPNOTE: don't show even emitted by the current user && don't show if it's not on the same chain
+            if (callerAddress !== toLowerAddress(address!) && chainId === contractChainId) {
+              toast.success(
+                <span>
+                  <Address
+                    address={callerAddress!}
+                    className="p-px"
+                    showCopyButton={false}
+                    showTooltip={false}
+                  />
+                  Added {incBy.toString()} to the counter
+                </span>,
+                {
+                  description: `View on ${blockExplorerName}`,
+                  action: <TransactionLink hash={txHash} showTooltip={false} />
+                }
+              )
             }
 
-            queryClient.invalidateQueries({
+            await queryClient.invalidateQueries({
               queryKey: ["counter-events"]
             })
+
             refetchCount()
           } catch (err) {
             console.error("Failed to process event:", err)

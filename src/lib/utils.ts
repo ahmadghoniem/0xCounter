@@ -1,3 +1,4 @@
+import { wagmiConfig } from "@/config/wagmi"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -8,10 +9,10 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Truncates an Ethereum address to show the first 6 and last 4 characters,
  * separated by an ellipsis (...).
- * @param {string | undefined | null} address The full Ethereum address (e.g., 0xAb5801a7d3999359aB9aCdE645a2d61d9aEa8c54).
+ * @param {`0x${string}` | undefined | null} address The full Ethereum address (e.g., 0xAb5801a7d3999359aB9aCdE645a2d61d9aEa8c54).
  * @returns {string} The truncated address (e.g., 0xAb58...8c54) or an empty string if invalid.
  */
-export function truncateAddress(address: string | undefined | null) {
+export function truncateAddress(address: `0x${string}` | undefined | null) {
   // Check if the address is valid, not null, and long enough to truncate
   if (!address || typeof address !== "string" || address.length < 10) {
     return ""
@@ -29,36 +30,27 @@ export function truncateAddress(address: string | undefined | null) {
   return `${start}...${end}`
 }
 
-type ResourceType = "address" | "transaction"
-
 export function getExplorerUrl(
   chainId: number,
   hashOrAddress: string,
-  resourceType: ResourceType
+  resourceType: "address" | "transaction"
 ): string {
-  const explorers: Record<number, string> = {
-    1: "https://etherscan.io",
-    11155111: "https://sepolia.etherscan.io",
-    84532: "https://sepolia.basescan.org",
-    31337: "#"
+  const chain = wagmiConfig.chains.find((c) => c.id === chainId)
+
+  if (!chain?.blockExplorers?.default) {
+    return "#"
   }
 
-  const resourcePaths: Record<ResourceType, string> = {
+  const resourcePaths: Record<"address" | "transaction", string> = {
     address: "/address/",
     transaction: "/tx/"
   }
 
-  const baseUrl: string | undefined = explorers[chainId]
+  const path = resourcePaths[resourceType]
+  const explorerUrl = chain.blockExplorers.default.url
+  return `${explorerUrl}${path}${hashOrAddress}`
+}
 
-  if (!baseUrl || baseUrl === "#") {
-    return "#"
-  }
-
-  const path: string | undefined = resourcePaths[resourceType]
-
-  if (!path) {
-    return "#"
-  }
-
-  return `${baseUrl}${path}${hashOrAddress}`
+export function toLowerAddress(addr: `0x${string}`): `0x${string}` {
+  return addr.toLowerCase() as `0x${string}`
 }
