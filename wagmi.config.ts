@@ -12,7 +12,7 @@ export default defineConfig({
       project: path.resolve(__dirname, "hardhat"),
       deployments: {
         Counter: {
-          [hardhat.id]: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+          [hardhat.id]: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
           [sepolia.id]: "0x81F81aBA45E26715a90eA59FD17dbbd4C2245326"
         }
       },

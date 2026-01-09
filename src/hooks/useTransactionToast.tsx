@@ -2,7 +2,7 @@ import { TransactionLink } from "@/components/TransactionLink"
 import { useIsLocalNetwork } from "@/hooks/useIsLocalNetwork"
 import { useEffect, useMemo } from "react"
 import { toast } from "sonner"
-import { BaseError, useAccount, useChainId } from "wagmi"
+import { BaseError, useAccount } from "wagmi"
 
 interface UseTransactionToastProps {
   isPending: boolean
@@ -25,7 +25,6 @@ export function useTransactionToast({
   hash,
   isIdle
 }: UseTransactionToastProps) {
-  const chainId = useChainId()
   const isLocalNetwork = useIsLocalNetwork()
   const { chain } = useAccount()
   const blockExplorerName = chain?.blockExplorers?.default?.name || "Block Explorer"
@@ -79,5 +78,5 @@ export function useTransactionToast({
       })
       return
     }
-  }, [stage, hash, error, chainId, isLocalNetwork, blockExplorerName])
+  }, [stage, hash, error, isLocalNetwork, blockExplorerName])
 }

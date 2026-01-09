@@ -25,7 +25,7 @@ export default function IncrementButton() {
   const { data: owner } = useReadCounterOwner()
 
   const isOwner = owner && address && toLowerAddress(owner) === toLowerAddress(address)
-  const [customIncrement, setCustomIncrement] = useState<bigint>(1n)
+  const [customIncrement, setCustomIncrement] = useState<number>(1)
 
   useTransactionToast({
     isPending,
@@ -38,9 +38,8 @@ export default function IncrementButton() {
   })
 
   const handleCustomIncrement = () => {
-    const value = BigInt(customIncrement)
-    if (value >= 1) {
-      handleIncBy(value)
+    if (customIncrement >= 1) {
+      handleIncBy(BigInt(customIncrement))
     }
   }
 
@@ -54,13 +53,9 @@ export default function IncrementButton() {
           min={1}
           value={customIncrement.toString()}
           onChange={(e) => {
-            try {
-              const value = BigInt(e.target.value || "1")
-              if (value >= 1n) {
-                setCustomIncrement(value)
-              }
-            } catch {
-              // Keep previous value on invalid input
+            const value = Number(e.target.value)
+            if (value >= 1) {
+              setCustomIncrement(value)
             }
           }}
           disabled={isPending || isConfirming}

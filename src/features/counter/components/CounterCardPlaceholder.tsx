@@ -3,18 +3,18 @@ import { FileCode2 } from "lucide-react"
 
 interface CounterCardPlaceholderProps {
   isConnected: boolean
-  isLocalContractDeployed: boolean
+  isDeployed: boolean
 }
 
 export default function CounterCardPlaceholder({
   isConnected,
-  isLocalContractDeployed
+  isDeployed
 }: CounterCardPlaceholderProps) {
   let message = "Loading..."
   if (!isConnected) {
     message =
       "Connect your wallet to read the counter state and send increment transactions on local Hardhat or testnets like Sepolia."
-  } else if (!isLocalContractDeployed) {
+  } else if (!isDeployed) {
     message = "No contract deployed on Hardhat local network."
   }
 

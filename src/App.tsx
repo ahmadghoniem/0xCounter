@@ -12,7 +12,7 @@ export default function App() {
       <div className="flex min-h-screen flex-col font-sans">
         <Header />
         <div className="flex flex-1 items-center justify-center">
-          <div className="flex min-h-108 flex-row gap-2">
+          <div className="flex flex-col gap-2 md:min-h-108 md:flex-row">
             <div className="flex flex-col gap-2">
               <div className="flex h-full flex-2/3">
                 <CounterCard />

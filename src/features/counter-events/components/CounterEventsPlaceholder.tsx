@@ -3,20 +3,20 @@ import { ScrollText } from "lucide-react"
 
 interface CounterEventsPlaceholderProps {
   isConnected: boolean
-  isLocalContractDeployed: boolean
+  isDeployed: boolean
   hasNoEvents: boolean
 }
 
 export default function CounterEventsPlaceholder({
   isConnected,
-  isLocalContractDeployed,
+  isDeployed,
   hasNoEvents
 }: CounterEventsPlaceholderProps) {
   let message = "Loading..."
   if (!isConnected) {
     message =
       "Connect your wallet to view indexed increment events from local Hardhat or testnets like Sepolia."
-  } else if (!isLocalContractDeployed) {
+  } else if (!isDeployed) {
     message = "No contract deployed on this network."
   } else if (hasNoEvents) {
     message = "No increments yet. Be the first — your transaction will be indexed here."

@@ -34,55 +34,52 @@ export default function useProcessCounterIncrement(refetchCount: () => void) {
 
           if (incBy === undefined) return
 
-          try {
-            const { error } = await supabase
-              .from("counter_events")
-              .insert({
-                tx_hash: txHash,
-                inc_by: incBy.toString(),
-                contract_address: contractAddress,
-                caller_address: callerAddress,
-                block_number: Number(log.blockNumber),
-                chain_id: chainId
-              })
-              .select()
-              .single()
+          const { error } = await supabase
+            .from("counter_events")
+            .insert({
+              tx_hash: txHash,
+              inc_by: incBy.toString(),
+              contract_address: contractAddress,
+              caller_address: callerAddress,
+              block_number: Number(log.blockNumber),
+              chain_id: chainId
+            })
+            .select()
+            .single()
 
-            if (error) {
-              if (error.code === "23505") {
-                console.log(`Transaction ${txHash} already indexed`)
-                return
-              }
-              console.error("Supabase insert error:", error)
+          if (error) {
+            if (error.code === "23505") {
+              console.log(`Transaction ${txHash} already indexed`)
               return
             }
-            // IMPNOTE: don't show even emitted by the current user && don't show if it's not on the same chain
-            if (callerAddress !== toLowerAddress(address!) && chainId === contractChainId) {
-              toast.success(
-                <span>
-                  <Address
-                    address={callerAddress!}
-                    className="p-px"
-                    showCopyButton={false}
-                    showTooltip={false}
-                  />
-                  Added {incBy.toString()} to the counter
-                </span>,
-                {
-                  description: `View on ${blockExplorerName}`,
-                  action: <TransactionLink hash={txHash} showTooltip={false} />
-                }
-              )
-            }
-
-            await queryClient.invalidateQueries({
-              queryKey: ["counter-events"]
-            })
-
-            refetchCount()
-          } catch (err) {
-            console.error("Failed to process event:", err)
+            console.error("Supabase insert error:", error)
+            return
           }
+
+          // IMPNOTE: don't show even emitted by the current user && don't show if it's not on the same chain
+          if (callerAddress !== toLowerAddress(address!) && chainId === contractChainId) {
+            toast.success(
+              <span>
+                <Address
+                  address={callerAddress!}
+                  className="p-px"
+                  showCopyButton={false}
+                  showTooltip={false}
+                />
+                Added {incBy.toString()} to the counter
+              </span>,
+              {
+                description: `View on ${blockExplorerName}`,
+                action: <TransactionLink hash={txHash} showTooltip={false} />
+              }
+            )
+          }
+
+          await queryClient.invalidateQueries({
+            queryKey: ["counter-events"]
+          })
+
+          refetchCount()
         })
       ).catch((err) => {
         console.error("Error processing logs:", err)

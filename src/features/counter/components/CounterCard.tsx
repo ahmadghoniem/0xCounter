@@ -1,7 +1,6 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useReadCounterCount } from "@/config/generated"
-import { useIsLocalContractDeployed } from "@/hooks/useIsLocalContractDeployed"
-import { useIsLocalNetwork } from "@/hooks/useIsLocalNetwork"
+import { useIsContractDeployed } from "@/hooks/useIsContractDeployed"
 import { useAccount } from "wagmi"
 import useProcessCounterIncrement from "../hooks/useProcessCounterIncrement"
 import CounterCardPlaceholder from "./CounterCardPlaceholder"
@@ -9,8 +8,7 @@ import IncrementButton from "./IncrementButton"
 
 export default function CounterCard() {
   const { isConnected } = useAccount()
-  const isLocalNetwork = useIsLocalNetwork()
-  const { isLocalContractDeployed } = useIsLocalContractDeployed()
+  const { isDeployed } = useIsContractDeployed()
 
   const {
     data: count,
@@ -21,19 +19,14 @@ export default function CounterCard() {
   } = useReadCounterCount({
     query: {
       refetchOnWindowFocus: false,
-      enabled: !isLocalNetwork || isLocalContractDeployed
+      enabled: isDeployed
     }
   })
   useProcessCounterIncrement(refetch)
 
   // Show placeholder when wallet is not connected, contract not found on chain, or still checking
-  if (!isConnected || !isLocalContractDeployed) {
-    return (
-      <CounterCardPlaceholder
-        isConnected={isConnected}
-        isLocalContractDeployed={isLocalContractDeployed}
-      />
-    )
+  if (!isConnected || !isDeployed) {
+    return <CounterCardPlaceholder isConnected={isConnected} isDeployed={isDeployed} />
   }
 
   return (

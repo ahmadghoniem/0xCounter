@@ -1,5 +1,5 @@
 import { counterAddress } from "@/config/generated"
-import { useIsLocalContractDeployed } from "@/hooks/useIsLocalContractDeployed"
+import { useIsContractDeployed } from "@/hooks/useIsContractDeployed"
 import { useIsLocalNetwork } from "@/hooks/useIsLocalNetwork"
 import { toLowerAddress } from "@/lib/utils"
 import { supabase, type CounterEvent } from "@/services/supabase"
@@ -21,7 +21,7 @@ interface CounterEventsResult {
 export function useCounterEvents(options: UseCounterEventsOptions = {}) {
   const chainId = useChainId()
   const isLocalNetwork = useIsLocalNetwork()
-  const { isLocalContractDeployed } = useIsLocalContractDeployed()
+  const { isDeployed } = useIsContractDeployed()
   const contractAddress = counterAddress[chainId as keyof typeof counterAddress]
   const { page = 0, itemsPerPage = ITEMS_PER_PAGE } = options
 
@@ -31,7 +31,7 @@ export function useCounterEvents(options: UseCounterEventsOptions = {}) {
       const from = page * itemsPerPage
       const to = from + itemsPerPage - 1
 
-      if (!isLocalContractDeployed) return { events: [], totalCount: 0 } // avoid querying if contract address is not deployed
+      if (!isDeployed) return { events: [], totalCount: 0 } // avoid querying if contract address is not deployed
 
       const { data, error, count } = await supabase
         .from("counter_events")
@@ -49,7 +49,7 @@ export function useCounterEvents(options: UseCounterEventsOptions = {}) {
     },
     refetchOnWindowFocus: false,
     staleTime: Infinity,
-    enabled: !isLocalNetwork || isLocalContractDeployed,
+    enabled: !isLocalNetwork || isDeployed,
     placeholderData: keepPreviousData
   })
 }

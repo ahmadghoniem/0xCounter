@@ -66,7 +66,7 @@ export const counterAbi = [
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x81F81aBA45E26715a90eA59FD17dbbd4C2245326)
  */
 export const counterAddress = {
-  31337: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
+  31337: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   11155111: '0x81F81aBA45E26715a90eA59FD17dbbd4C2245326',
 } as const
 

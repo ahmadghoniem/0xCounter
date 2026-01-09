@@ -1,66 +1,173 @@
-# Sample Hardhat 3 Beta Project (`node:test` and `viem`)
+# 0xCounter
 
-This project showcases a Hardhat 3 Beta project using the native Node.js test runner (`node:test`) and the `viem`
-library for Ethereum interactions.
+# 0xCounter
 
-To learn more about the Hardhat 3 Beta, please visit the
-[Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your
-feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or
-[open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+A minimal, full-stack Web3 starter project designed to demonstrate robust dApp architecture. This project serves as a reference implementation for handling real-time blockchain events and ensuring data consistency via backlog synchronization.
 
-## Project Overview
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
+![React](https://img.shields.io/badge/React-19-blue)
+![Vite](https://img.shields.io/badge/Vite-5.0-purple)
+![Wagmi](https://img.shields.io/badge/Wagmi-2.0-grey)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-This example project includes:
+<!-- Replace with actual screenshot -->
+<img width="1200" alt="0xCounter Dashboard" src="https://via.placeholder.com/1200x600.png?text=0xCounter+Dashboard+Placeholder" />
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using [`node:test`](nodejs.org/api/test.html), the new Node.js native test runner, and
-  [`viem`](https://viem.sh/).
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+## 🌟 Key Features
 
-## Usage
+- **⚡ Real-Time Global Counter**
+  Demonstrates how to listen for blockchain events in real-time and update the UI instantly across clients using Wagmi watchers.
 
-### Running Tests
+- **🔄 Resilient Backlog Sync**
+  Implements a "catch-up" mechanism to query past logs on initialization, identifying and indexing any events missed during downtime.
 
-To run all the tests in the project, execute the following command:
+- **📜 Comprehensive Event History**
+  Combines real-time streams with historical data from Supabase to provide a unified, persistent transaction log.
 
-```shell
-npx hardhat test
+- **🆔 Integrated Web3 Identity**
+  Shows how to resolve ENS names and avatars for improved user experience.
+
+- **🔗 Multi-Chain Configuration**
+  Pre-configured for both local development (Hardhat) and testnets (Sepolia), ensuring a smooth developer experience.
+
+## 🛠️ Technology Stack
+
+### Frontend & Core
+
+- **React 19**: Leveraging the latest concurrent features.
+- **Vite**: Lightning-fast build tool and dev server.
+- **Tailwind CSS**: Utility-first styling for a bespoke design system.
+- **Shadcn UI**: Beautifully designed components built with Radix UI and Tailwind.
+
+### Web3 Integration
+
+- **Wagmi & Viem**: The best-in-class hooks and low-level interfaces for Ethereum.
+- **RainbowKit**: Beautiful, accessible wallet connection choices.
+
+### Data & Infrastructure
+
+- **Supabase**: High-performance database for indexing and persisting event history.
+- **Hardhat**: Complete environment for smart contract development and testing.
+
+## 🔄 Transaction Lifecycle
+
+The application employs a dual-indexing strategy to ensure no data is lost, combining real-time listeners with a backlog synchronization mechanism.
+
+1.  **Initiation**:
+    - User clicks **Increment** in the UI.
+    - `IncrementButton` triggers a transaction via Wagmi's `useWriteContract`.
+    - Smart Contract emits an `Incremented(caller, value)` event upon success.
+
+2.  **Real-Time Processing**:
+    - `useWatchCounterIncrementEvent` (Wagmi) detects the event immediately.
+    - The event details are captured and sent to **Supabase** via `useProcessCounterIncrement`.
+    - A toast notification ("Added +1 to the counter") appears, linking to the transaction explorer.
+
+3.  **Backlog Synchronization** (Resilience):
+    - On app load, `useBacklogSync` checks the last indexed block in the database.
+    - It queries the blockchain (via Viem's `getLogs`) for any events having occurred since that block.
+    - Any missing events (e.g., those occurring while the app was closed) are batched and inserted into Supabase.
+
+4.  **Display**:
+    - The `CounterEvents` component fetches the unified list from Supabase.
+    - Users see a complete, persistent history of all interactions.
+
+## 🏗️ Project Structure
+
+```
+0xCounter/
+├── hardhat/                # Smart contract development
+├── public/                 # Static assets
+├── src/
+│   ├── components/         # Reusable UI components
+│   ├── config/             # App configuration
+│   ├── features/           # Feature-based logic
+│   │   ├── counter/        # Counter specific logic & UI
+│   │   ├── counter-events/ # Event processing & history
+│   │   └── identity/       # User identity & authentication
+│   ├── hooks/              # Global React hooks
+│   ├── lib/                # Utilities
+│   ├── services/           # External service integrations (Supabase)
+│   ├── App.tsx             # Main application component
+│   └── main.tsx            # Entry point
+├── .env                    # Environment variables
+└── package.json
 ```
 
-You can also selectively run the Solidity or `node:test` tests:
+## 🚀 Getting Started
 
-```shell
-npx hardhat test solidity
-npx hardhat test nodejs
+### Prerequisites
+
+- Node.js (v18+)
+- Metamask or another Web3 wallet
+
+### Installation
+
+### Installation
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. **Configuration (Secrets Management)**
+
+   This project uses the **Hardhat Keystore** plugin for secure secret management, avoiding plain-text `.env` files for sensitive keys.
+
+   Set your private key (for deployment) and RPC URLs (for fetching data):
+
+   ```bash
+   # Private key for the deployer account
+   pnpm hardhat vars set WALLET_PRIVATE_KEY
+
+   # RPC URL for Sepolia (WebSocket WSS is recommended for reliable event listening)
+   pnpm hardhat vars set ETHEREUM_SEPOLIA_RPC_URL
+   ```
+
+   > **Note**: For `ETHEREUM_SEPOLIA_RPC_URL`, use a provider like [Infura](https://docs.metamask.io/services/get-started/infura) or Alchemy. **Crucial**: Use the `wss://` (WebSocket) endpoint, not `https://`. See [Troubleshooting](#-troubleshooting) for why.
+
+### Running Locally
+
+Start the development server:
+
+```bash
+pnpm dev
 ```
 
-### Make a deployment to Sepolia
+To run the local hardhat node and deploy contracts:
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally
-simulated chain or to Sepolia.
-
-To run the deployment to a local chain:
-
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
+```bash
+pnpm hardhat:node
+pnpm hardhat:deploy
 ```
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat
-configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key
-of the account you want to use.
+**Deploying to Sepolia Testnet**:
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment
-variable.
+1. **Get Testnet Funds**: You need Sepolia ETH to pay for gas. Claim it for free from the [Google Cloud Web3 Faucet](https://cloud.google.com/application/web3/faucet/ethereum/sepolia).
+2. **Deploy**:
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
-
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
+```bash
+pnpm hardhat:deploy:sepolia
 ```
 
-After setting the variable, you can run the deployment with the Sepolia network:
+### Code Generation
 
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
+Sync Wagmi hooks with your smart contracts:
+
+```bash
+pnpm wagmi:generate
 ```
+
+## 🔧 Troubleshooting
+
+### Reliable Event Listening (WebSockets vs HTTPS)
+
+If you notice that `useWatchContractEvent` isn't firing on Sepolia, check your RPC transport config.
+
+- **The Issue**: Public `https` endpoints often rely on polling, which can be slow or inconsistent, causing the app to miss real-time events.
+- **The Fix**: Explicitly configure a **WebSocket (`wss://`)** transport in `wagmi.config.ts` (and your Hardhat vars). This establishes a persistent connection, allowing the node to push events to your client instantly.
+
+### Local Development Pitfalls
+
+- **"Contract not found" after restart**: Restarting the local Hardhat node (`pnpm hardhat:node`) wipes the local blockchain state. You **must** redeploy your contracts (`pnpm hardhat:deploy`) and reset your Metamask account's nonce (Settings > Advanced > Clear Activity Tab Data) after every restart.
